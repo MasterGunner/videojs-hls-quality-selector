@@ -94,11 +94,12 @@ class HlsQualitySelectorPlugin {
 
     for (let i = 0; i < levels.length; ++i) {
       if (!levelItems.filter(_existingItem => {
-        return _existingItem.item && _existingItem.item.value === levels[i].height;
+        return _existingItem.item && _existingItem.item.value === levels[i].label.match(/\/([^/]+)\.m3u8/)[1];
       }).length) {
+        let levelName = levels[i].label.match(/\/([^/]+)\.m3u8/)[1];
         const levelItem = this.getQualityMenuItem.call(this, {
-          label: levels[i].height + 'p',
-          value: levels[i].height
+          label: levelName,
+          value: levelName
         });
 
         levelItems.push(levelItem);
@@ -136,15 +137,15 @@ class HlsQualitySelectorPlugin {
   /**
    * Sets quality (based on media height)
    *
-   * @param {number} height - A number representing HLS playlist.
+   * @param {string} name - A string representing HLS playlist.
    */
-  setQuality(height) {
+  setQuality(name) {
     const qualityList = this.player.qualityLevels();
 
     for (let i = 0; i < qualityList.length; ++i) {
       const quality = qualityList[i];
 
-      quality.enabled = (quality.height === height || height === 'auto');
+      quality.enabled = (quality.label.match(/\/([^/]+)\.m3u8/)[1] === name || name === 'auto');
     }
     this._qualityButton.unpressButton();
   }
